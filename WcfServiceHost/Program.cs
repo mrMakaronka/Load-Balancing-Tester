@@ -18,7 +18,6 @@ namespace WcfServiceHost
             try
             {
                 host.Open();
-                Console.WriteLine("Service is started");
                 Console.WriteLine("Press <ENTER> to terminate");
                 Console.ReadLine();
                 host.Close();

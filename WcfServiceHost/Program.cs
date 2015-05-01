@@ -7,25 +7,35 @@ using System.ServiceModel.Web;
 using WcfServiceLibrary;
 using System.ServiceModel;
 using System.ServiceModel.Description;
+using System.Configuration;
 
 namespace WcfServiceHost
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            ServiceHost host = new ServiceHost(typeof(TestService));
-            try
+            string serverName = ConfigurationManager.AppSettings["ServerName"];
+            if (serverName == null)
             {
-                host.Open();
-                Console.WriteLine("Press <ENTER> to terminate");
-                Console.ReadLine();
-                host.Close();
+                throw new ConfigurationErrorsException("Parameter ServerName is missed");
             }
-            catch (CommunicationException cex)
+
+            TestService testServiceInstance = new TestService(serverName);
+            using (ServiceHost host = new ServiceHost(testServiceInstance))
             {
-                Console.WriteLine("An exception occurred: {0}", cex.Message);
-                host.Abort();
+                try
+                {
+                    host.Open();
+                    Console.WriteLine("Press <ENTER> to terminate");
+                    Console.ReadLine();
+                    host.Close();
+                }
+                catch (CommunicationException cex)
+                {
+                    Console.WriteLine("An exception occurred: {0}", cex.Message);
+                    host.Abort();
+                }
             }
         }
     }

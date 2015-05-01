@@ -23,6 +23,8 @@ namespace WcfServiceLibrary
         
         private bool BoolValueField;
         
+        private WcfServiceLibrary.InnerCompositeType InnerCompositeTypeField;
+        
         private string StringValueField;
         
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData
@@ -51,6 +53,19 @@ namespace WcfServiceLibrary
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public WcfServiceLibrary.InnerCompositeType InnerCompositeType
+        {
+            get
+            {
+                return this.InnerCompositeTypeField;
+            }
+            set
+            {
+                this.InnerCompositeTypeField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string StringValue
         {
             get
@@ -63,6 +78,57 @@ namespace WcfServiceLibrary
             }
         }
     }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="InnerCompositeType", Namespace="http://schemas.datacontract.org/2004/07/WcfServiceLibrary")]
+    public partial class InnerCompositeType : object, System.Runtime.Serialization.IExtensibleDataObject
+    {
+        
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string[] ListOfStringsField;
+        
+        private string ServerNameField;
+        
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return this.extensionDataField;
+            }
+            set
+            {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string[] ListOfStrings
+        {
+            get
+            {
+                return this.ListOfStringsField;
+            }
+            set
+            {
+                this.ListOfStringsField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string ServerName
+        {
+            get
+            {
+                return this.ServerNameField;
+            }
+            set
+            {
+                this.ServerNameField = value;
+            }
+        }
+    }
 }
 
 
@@ -71,17 +137,72 @@ namespace WcfServiceLibrary
 public interface ITestService
 {
     
-    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetData", ReplyAction="http://tempuri.org/ITestService/GetDataResponse")]
-    string GetData(int value);
+    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetStringData", ReplyAction="http://tempuri.org/ITestService/GetStringDataResponse")]
+    string GetStringData(string stringValue);
     
-    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetData", ReplyAction="http://tempuri.org/ITestService/GetDataResponse")]
-    System.Threading.Tasks.Task<string> GetDataAsync(int value);
+    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetStringData", ReplyAction="http://tempuri.org/ITestService/GetStringDataResponse")]
+    System.Threading.Tasks.Task<string> GetStringDataAsync(string stringValue);
     
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetDataUsingDataContract", ReplyAction="http://tempuri.org/ITestService/GetDataUsingDataContractResponse")]
     WcfServiceLibrary.CompositeType GetDataUsingDataContract(WcfServiceLibrary.CompositeType composite);
     
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetDataUsingDataContract", ReplyAction="http://tempuri.org/ITestService/GetDataUsingDataContractResponse")]
     System.Threading.Tasks.Task<WcfServiceLibrary.CompositeType> GetDataUsingDataContractAsync(WcfServiceLibrary.CompositeType composite);
+    
+    // CODEGEN: Контракт генерации сообщений с именем упаковщика (InputStreamMessage) сообщения InputStreamMessage не соответствует значению по умолчанию (GetLargeData).
+    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetLargeData", ReplyAction="http://tempuri.org/ITestService/GetLargeDataResponse")]
+    OutputStreamMessage GetLargeData(InputStreamMessage request);
+    
+    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITestService/GetLargeData", ReplyAction="http://tempuri.org/ITestService/GetLargeDataResponse")]
+    System.Threading.Tasks.Task<OutputStreamMessage> GetLargeDataAsync(InputStreamMessage request);
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="InputStreamMessage", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class InputStreamMessage
+{
+    
+    [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+    public int NullCount;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+    public System.IO.Stream Data;
+    
+    public InputStreamMessage()
+    {
+    }
+    
+    public InputStreamMessage(int NullCount, System.IO.Stream Data)
+    {
+        this.NullCount = NullCount;
+        this.Data = Data;
+    }
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="OutputStreamMessage", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class OutputStreamMessage
+{
+    
+    [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+    public string ServerName;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+    public System.IO.Stream Data;
+    
+    public OutputStreamMessage()
+    {
+    }
+    
+    public OutputStreamMessage(string ServerName, System.IO.Stream Data)
+    {
+        this.ServerName = ServerName;
+        this.Data = Data;
+    }
 }
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -118,14 +239,14 @@ public partial class TestServiceClient : System.ServiceModel.ClientBase<ITestSer
     {
     }
     
-    public string GetData(int value)
+    public string GetStringData(string stringValue)
     {
-        return base.Channel.GetData(value);
+        return base.Channel.GetStringData(stringValue);
     }
     
-    public System.Threading.Tasks.Task<string> GetDataAsync(int value)
+    public System.Threading.Tasks.Task<string> GetStringDataAsync(string stringValue)
     {
-        return base.Channel.GetDataAsync(value);
+        return base.Channel.GetStringDataAsync(stringValue);
     }
     
     public WcfServiceLibrary.CompositeType GetDataUsingDataContract(WcfServiceLibrary.CompositeType composite)
@@ -136,5 +257,35 @@ public partial class TestServiceClient : System.ServiceModel.ClientBase<ITestSer
     public System.Threading.Tasks.Task<WcfServiceLibrary.CompositeType> GetDataUsingDataContractAsync(WcfServiceLibrary.CompositeType composite)
     {
         return base.Channel.GetDataUsingDataContractAsync(composite);
+    }
+    
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    OutputStreamMessage ITestService.GetLargeData(InputStreamMessage request)
+    {
+        return base.Channel.GetLargeData(request);
+    }
+    
+    public string GetLargeData(int NullCount, ref System.IO.Stream Data)
+    {
+        InputStreamMessage inValue = new InputStreamMessage();
+        inValue.NullCount = NullCount;
+        inValue.Data = Data;
+        OutputStreamMessage retVal = ((ITestService)(this)).GetLargeData(inValue);
+        Data = retVal.Data;
+        return retVal.ServerName;
+    }
+    
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    System.Threading.Tasks.Task<OutputStreamMessage> ITestService.GetLargeDataAsync(InputStreamMessage request)
+    {
+        return base.Channel.GetLargeDataAsync(request);
+    }
+    
+    public System.Threading.Tasks.Task<OutputStreamMessage> GetLargeDataAsync(int NullCount, System.IO.Stream Data)
+    {
+        InputStreamMessage inValue = new InputStreamMessage();
+        inValue.NullCount = NullCount;
+        inValue.Data = Data;
+        return ((ITestService)(this)).GetLargeDataAsync(inValue);
     }
 }

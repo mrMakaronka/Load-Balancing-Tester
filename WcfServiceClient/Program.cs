@@ -15,7 +15,7 @@ namespace WcfServiceClient
             {
                 using (var testService = new TestServiceClient())
                 {
-                    string message = testService.GetData(11);
+                    string message = testService.GetStringData("Test string");
                     Console.WriteLine(message);
                 }
             }

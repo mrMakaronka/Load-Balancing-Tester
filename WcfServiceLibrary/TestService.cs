@@ -10,7 +10,7 @@ using WcfServiceLibrary.Utils;
 
 namespace WcfServiceLibrary
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, AddressFilterMode = AddressFilterMode.Any)]
     public class TestService : ITestService
     {
         private string _serverName;

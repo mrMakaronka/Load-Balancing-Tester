@@ -8,6 +8,7 @@ using WcfServiceLibrary;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.Configuration;
+using System.Net;
 
 namespace WcfServiceHost
 {
@@ -27,6 +28,11 @@ namespace WcfServiceHost
                 try
                 {
                     host.Open();
+                    Console.WriteLine("IPs: ");
+                    foreach (IPAddress ip in HostUtils.GetLocalIPAddresses()) {
+                        Console.WriteLine(ip.ToString());
+                    }
+                    Console.WriteLine();
                     Console.WriteLine("Press <ENTER> to terminate");
                     Console.ReadLine();
                     host.Close();

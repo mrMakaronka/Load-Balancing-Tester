@@ -50,7 +50,6 @@ namespace WcfServiceLibrary
                     composite.InnerCompositeType.ListOfStrings[i] = EncryptionUtils.HashSHA1String(composite.InnerCompositeType.ListOfStrings[i]);
                 }
             }
-
             return composite;
         }
 

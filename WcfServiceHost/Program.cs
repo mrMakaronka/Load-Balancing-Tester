@@ -16,13 +16,13 @@ namespace WcfServiceHost
     {
         static void Main()
         {
-            string serverName = ConfigurationManager.AppSettings["ServerName"];
-            if (serverName == null)
+            int serverId;
+            if (!int.TryParse(ConfigurationManager.AppSettings["ServerId"], out serverId))
             {
-                throw new ConfigurationErrorsException("Parameter ServerName is missed");
+                throw new ConfigurationErrorsException("Parameter ServerId is not set");
             }
 
-            TestService testServiceInstance = new TestService(serverName);
+            StatelessService testServiceInstance = new StatelessService(serverId);
             using (ServiceHost host = new ServiceHost(testServiceInstance))
             {
                 try

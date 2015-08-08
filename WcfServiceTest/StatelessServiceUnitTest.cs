@@ -1,20 +1,28 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
-using System.Text;
+using NUnit.Framework;
+using WcfServiceClient.RestClients;
 using WcfServiceLibrary;
 using WcfServiceTest.Utils;
-using WcfServiceLibrary.Utils;
-using System.Configuration;
-using System.Collections.Concurrent;
-using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
 
 namespace WcfServiceTest
 {
     [TestFixture]
-    public class TestServiceTest
+    public class StatelessServiceTest : IDisposable
     {
-        private static StatelessServiceClient _statelessService = new StatelessServiceClient("BasicHttpEndPoint");
+        private static readonly IStatelessService BasicHttpBindingClient;
+        private static readonly IStatelessService WebHttpBindingClient;
+        private static readonly IStatelessService NetTcpBindingClient;
+        private static readonly IStatelessService UdpBindingClient;
+
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (used as test case parameter)
+        private static readonly IStatelessService[] ServiceBindingCasesWithStreaming;
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (used as test case parameter)
+        private static readonly IStatelessService[] ServiceBindingCasesWithoutStreaming;
 
         private static int _serversNumber;
         private static int _requestsPerTest;
@@ -22,22 +30,42 @@ namespace WcfServiceTest
 
         private ConcurrentDictionary<int, int> _responseNumberFromServers;
 
-        static object[] ServiceBindingCases =
+        static StatelessServiceTest() 
         {
-            new object[] { new StatelessServiceClient("BasicHttpEndPoint") },
-            new object[] { new StatelessServiceClient("WebHttpEndPoint") },
-            new object[] { new StatelessServiceClient("NetTcpEndPoint") },
-            new object[] { new StatelessServiceClient("UdpEndPoint") }
-        };
+            string webHttpEndpoint = ConfigurationManager.AppSettings["WebHttpEndpoint"];
+            WebHttpBindingClient = new StatelessServiceRestClient(new Uri(webHttpEndpoint));
+            BasicHttpBindingClient = new StatelessServiceClient("BasicHttpEndPoint");
+            NetTcpBindingClient = new StatelessServiceClient("NetTcpEndPoint");
+            UdpBindingClient = new StatelessServiceClient("UdpEndPoint");
+
+            ServiceBindingCasesWithStreaming = new[]
+            {
+                BasicHttpBindingClient, 
+                WebHttpBindingClient, 
+                NetTcpBindingClient
+            };
+            ServiceBindingCasesWithoutStreaming = new[]
+            {
+                BasicHttpBindingClient,
+                WebHttpBindingClient,
+                NetTcpBindingClient,
+                UdpBindingClient
+            };
+        }
 
         [TestFixtureSetUp]
         public static void ClassInitialize()
         {
             _serversNumber = int.Parse(ConfigurationManager.AppSettings["ServersNumber"]);
             _requestsPerTest = int.Parse(ConfigurationManager.AppSettings["RequestsPerTest"]);
-
-            //_statelessService = new StatelessServiceClient("BasicHttpEndPoint");
             _random = new Random((int)DateTime.Now.Ticks);
+        }
+
+        [TestFixtureTearDown]
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         [SetUp]
@@ -55,8 +83,8 @@ namespace WcfServiceTest
             }
         }
 
-        [Test, TestCaseSource("ServiceBindingCases")]
-        public void GetServerIdTest(StatelessServiceClient statelessService)
+        [Test, TestCaseSource("ServiceBindingCasesWithoutStreaming")]
+        public void GetServerIdTest(IStatelessService statelessService)
         {
             //Act
             for (int i = 0; i < _requestsPerTest; i++)
@@ -69,99 +97,85 @@ namespace WcfServiceTest
             //The only assertion for this test is contained in TestCleanup method
         }
 
-        /*[TestMethod]
-        public void RegisterUserTest()
+        [Test, TestCaseSource("ServiceBindingCasesWithoutStreaming")]
+        public void RegisterUserTest(IStatelessService statelessService)
         {
             for (int i = 0; i < _requestsPerTest; i++)
             {   
                 //Arrange
-                UserInfo userInfo = new UserInfo();
-                userInfo.Name = RandomUtils.GetRandomString(_random, _random.Next(100));
-                userInfo.Age = _random.Next();
+                UserInfo userInfo = new UserInfo
+                {
+                    Name = RandomUtils.GetRandomString(_random, _random.Next(100)),
+                    Age = _random.Next()
+                };
 
                 //Act
-                RegisteredUserInfo registeredUserInfo = _statelessService.RegisterUser(userInfo);
+                RegisteredUserInfo registeredUserInfo = statelessService.RegisterUser(userInfo);
                 _responseNumberFromServers.AddOrUpdate(registeredUserInfo.ServerId, 1, (id, count) => count + 1);
 
                 //Assert
                 Assert.AreEqual(userInfo.Name, registeredUserInfo.UserInfo.Name);
                 Assert.AreEqual(userInfo.Age, registeredUserInfo.UserInfo.Age);
             }
-        }*/
-
-        /*[TestMethod]
-        public void GetDataUsingDataContractTestPutTrue()
-        {
-            //Arrange
-            CompositeType testCompositeType = new CompositeType();
-            testCompositeType.BoolValue = false;
-            testCompositeType.StringValue = TestString;
-
-            //Act
-            CompositeType resultCompositeType = _testService.GetDataUsingDataContract(testCompositeType);
-
-            //Assert
-            Assert.AreEqual("FALSE", resultCompositeType.StringValue);
         }
 
-        [TestMethod]
-        public void GetDataUsingDataContractTestInnerType()
+        [Test, TestCaseSource("ServiceBindingCasesWithStreaming")]
+        public void UploadFileTest(IStatelessService statelessService)
         {
             //Arrange
-            CompositeType testCompositeType = new CompositeType();
-            testCompositeType.BoolValue = false;
-            testCompositeType.StringValue = TestString;
-
-            const int TestStringsCount = 100;
-            const int RandomStringSize = 100;
-            string[] testStrings = RandomUtils.GetArrayOfRandomStrings(TestStringsCount, RandomStringSize);
-            string[] expectedResultStrings = CryptoUtils.HashSHA1StringArray(testStrings);
-
-            InnerCompositeType testInnerCompositeType = new InnerCompositeType();
-            testInnerCompositeType.ListOfStrings = testStrings;
-            testInnerCompositeType.ServerName = TestString;
-            testCompositeType.InnerCompositeType = testInnerCompositeType;
-
-            //Act
-            CompositeType resultCompositeType = _testService.GetDataUsingDataContract(testCompositeType);
-
-            //Assert
-            Assert.AreEqual(ServerName, resultCompositeType.InnerCompositeType.ServerName);
-            CollectionAssert.AreEqual(expectedResultStrings, resultCompositeType.InnerCompositeType.ListOfStrings);
-        }
-
-        [TestMethod]
-        public void GetLargeDataTest()
-        {
-            //Arrange
-            byte[] testBytes = Encoding.UTF8.GetBytes(TestString);
-            byte[] nullBytes = new byte[TestString.Length];
-            for (int i = 0; i < TestString.Length; i++)
+            string fileForUploadingPath = ConfigurationManager.AppSettings["FileForUploadingPath"];
+            for (int i = 0; i < _requestsPerTest; i++)
             {
-                nullBytes[i] = 0;
-            }
-
-            Stream testStream = new MemoryStream(testBytes);
-            //Act
-            try
-            {
-                string serverName = _testService.GetLargeData(TestString.Length, ref testStream);
-
-                //Assert
-                Assert.AreEqual(ServerName, serverName);
-                byte[] buffer = new byte[TestString.Length];
-                testStream.Read(buffer, 0, buffer.Length);
-                CollectionAssert.AreEqual(testBytes, buffer);
-                testStream.Read(buffer, 0, buffer.Length);
-                CollectionAssert.AreEqual(nullBytes, buffer);
-            }
-            finally
-            {
-                if (testStream != null)
+                using (FileStream fileStream = File.Open(fileForUploadingPath, FileMode.Open))
                 {
-                    ((IDisposable)testStream).Dispose();
+                    //Act
+                    UploadedFileInfo uploadedFileInfo = statelessService.UploadFile(fileStream);
+                    _responseNumberFromServers.AddOrUpdate(uploadedFileInfo.ServerId, 1, (id, count) => count + 1);
+
+                    //Assert
+                    Assert.AreEqual(fileStream.Length, uploadedFileInfo.FileSize);
                 }
             }
-        }*/
+        }
+
+        [Test, TestCaseSource("ServiceBindingCasesWithStreaming")]
+        public void DownloadFileTest(IStatelessService statelessService)
+        {
+            //Arrange
+            string downloadedFilePath = ConfigurationManager.AppSettings["DownloadedFilePath"];
+            int downloadedFileExpectedLength = 39564720;
+
+            for (int i = 0; i < _requestsPerTest; i++)
+            {
+                //Act
+                using (Stream downloadedFileStream = statelessService.DownloadFile())
+                {
+                    byte[] serverIdBytes = new byte[sizeof(int)];
+                    downloadedFileStream.Read(serverIdBytes, 0, serverIdBytes.Length);
+                    int serverId = BitConverter.ToInt32(serverIdBytes, 0);
+                    _responseNumberFromServers.AddOrUpdate(serverId, 1, (id, count) => count + 1);
+
+                    using (FileStream downloadedTmpFileStream = File.Create(downloadedFilePath))
+                    {
+                        downloadedFileStream.CopyTo(downloadedTmpFileStream);
+                        
+                        //Assert
+                        Assert.AreEqual(downloadedFileExpectedLength, downloadedTmpFileStream.Length);
+                    }
+                    File.Delete(downloadedFilePath);
+                }
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ((IDisposable)BasicHttpBindingClient).Dispose();
+                ((IDisposable)WebHttpBindingClient).Dispose();
+                ((IDisposable)NetTcpBindingClient).Dispose();
+                ((IDisposable)UdpBindingClient).Dispose();
+            }
+        }
     }
 }

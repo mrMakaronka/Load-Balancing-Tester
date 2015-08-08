@@ -1,25 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.Text;
 
 namespace WcfServiceLibrary
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, AddressFilterMode = AddressFilterMode.Any)]
     public class StatelessService : IStatelessService
     {
-        private int _serverId;
-        private string _executableDirPath;
+        private readonly int _serverId;
 
         public StatelessService(int serverId)
         {
             _serverId = serverId;
-            _executableDirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
         public int GetServerId()
@@ -34,9 +27,11 @@ namespace WcfServiceLibrary
                 throw new ArgumentNullException("userInfo");
             }
 
-            RegisteredUserInfo registeredUserInfo = new RegisteredUserInfo();
-            registeredUserInfo.UserInfo = userInfo;
-            registeredUserInfo.ServerId = _serverId;
+            RegisteredUserInfo registeredUserInfo = new RegisteredUserInfo
+            {
+                UserInfo = userInfo,
+                ServerId = _serverId
+            };
             return registeredUserInfo;
         }
 
@@ -47,10 +42,8 @@ namespace WcfServiceLibrary
                 throw new ArgumentNullException("fileStream");
             }
 
-            UploadedFileInfo uploadedFileInfo = new UploadedFileInfo();
-            uploadedFileInfo.ServerId = _serverId;
-
-            string uploadedFilePath = Path.Combine(_executableDirPath, "Resources\\UploadedFile.jpg");
+            UploadedFileInfo uploadedFileInfo = new UploadedFileInfo {ServerId = _serverId};
+            string uploadedFilePath = ConfigurationManager.AppSettings["UploadedFilePath"];
             using (FileStream uploadedFileStream = File.Create(uploadedFilePath))
             {
                 using (fileStream)
@@ -65,10 +58,10 @@ namespace WcfServiceLibrary
 
         public Stream DownloadFile()
         {
-            string downloadingFilePath = Path.Combine(_executableDirPath, "Resources\\FileForDownloading.jpg");
-            FileStream downloadingFileStream = File.Open(downloadingFilePath, FileMode.Open);
-            string tmpFilePath = Path.Combine(_executableDirPath, "Resources\\TMP.jpg");
-            FileStream tmpFileStream = File.Create(tmpFilePath);
+            string fileForDownloadingPath = ConfigurationManager.AppSettings["FileForDownloadingPath"];
+            FileStream downloadingFileStream = File.Open(fileForDownloadingPath, FileMode.Open);
+            string tmpFileForDownloadingPath = ConfigurationManager.AppSettings["TmpFileForDownloadingPath"];
+            FileStream tmpFileStream = File.Create(tmpFileForDownloadingPath);
 
             byte[] valueBytes = BitConverter.GetBytes(_serverId);
             tmpFileStream.Write(valueBytes, 0, valueBytes.Length);
@@ -78,18 +71,12 @@ namespace WcfServiceLibrary
             OperationContext operationContext = OperationContext.Current;
             if (operationContext != null)
             {
-                operationContext.OperationCompleted += new EventHandler(delegate(object sender, EventArgs args)
+                operationContext.OperationCompleted += delegate
                 {
-                    if (downloadingFileStream != null)
-                    {
-                        downloadingFileStream.Dispose();
-                    }
-                    if (tmpFileStream != null)
-                    {
-                        tmpFileStream.Dispose();
-                    }
-                    File.Delete(tmpFilePath);
-                });
+                    downloadingFileStream.Dispose();
+                    tmpFileStream.Dispose();
+                    File.Delete(tmpFileForDownloadingPath);
+                };
             }
 
             return tmpFileStream;

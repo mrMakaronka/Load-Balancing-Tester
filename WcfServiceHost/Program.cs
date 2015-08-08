@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ServiceModel.Web;
-using WcfServiceLibrary;
-using System.ServiceModel;
-using System.ServiceModel.Description;
 using System.Configuration;
 using System.Net;
+using System.ServiceModel;
+using WcfServiceHost.Utils;
+using WcfServiceLibrary;
 
 namespace WcfServiceHost
 {
@@ -29,7 +24,7 @@ namespace WcfServiceHost
                 {
                     host.Open();
                     Console.WriteLine("IPs: ");
-                    foreach (IPAddress ip in HostUtils.GetLocalIPAddresses()) {
+                    foreach (IPAddress ip in HostUtils.GetLocalIpAddresses()) {
                         Console.WriteLine(ip.ToString());
                     }
                     Console.WriteLine();

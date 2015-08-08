@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace WcfServiceHost
+namespace WcfServiceHost.Utils
 {
     static class HostUtils
     {
-        public static List<IPAddress> GetLocalIPAddresses()
+        public static List<IPAddress> GetLocalIpAddresses()
         {
             List<IPAddress> ips = NetworkInterface.GetAllNetworkInterfaces()
             .Where(x => x.NetworkInterfaceType != NetworkInterfaceType.Loopback)

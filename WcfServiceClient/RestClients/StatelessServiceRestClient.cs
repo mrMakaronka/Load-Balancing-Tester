@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
-using System.ServiceModel;
-using System.ServiceModel.Description;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using WcfServiceLibrary;
@@ -14,17 +11,9 @@ namespace WcfServiceClient.RestClients
         private readonly WebChannelFactory<IStatelessService> _webChannelFactory;
         private readonly IStatelessService _statelessService;
 
-        public StatelessServiceRestClient(Uri endpointUri)
+        public StatelessServiceRestClient(string enpointConfigurationName)
         {
-            int maxReceivedMessageSize = Int32.Parse(ConfigurationManager.AppSettings["MaxReceivedMessageSize"]);
-            WebHttpBinding webHttpBinding = new WebHttpBinding { MaxReceivedMessageSize = maxReceivedMessageSize };
-            _webChannelFactory = new WebChannelFactory<IStatelessService>(
-                webHttpBinding,
-                endpointUri
-            );
-
-            IEndpointBehavior endpointBehavior = new WebHttpBehavior();
-            _webChannelFactory.Endpoint.EndpointBehaviors.Add(endpointBehavior);
+            _webChannelFactory = new WebChannelFactory<IStatelessService>(enpointConfigurationName);
             _statelessService = _webChannelFactory.CreateChannel();
         }
 

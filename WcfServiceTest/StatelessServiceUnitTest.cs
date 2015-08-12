@@ -32,9 +32,8 @@ namespace WcfServiceTest
 
         static StatelessServiceTest() 
         {
-            string webHttpEndpoint = ConfigurationManager.AppSettings["WebHttpEndpoint"];
-            WebHttpBindingClient = new StatelessServiceRestClient(new Uri(webHttpEndpoint));
             BasicHttpBindingClient = new StatelessServiceClient("BasicHttpEndPoint");
+            WebHttpBindingClient = new StatelessServiceRestClient("WebHttpEndPoint");
             NetTcpBindingClient = new StatelessServiceClient("NetTcpEndPoint");
             UdpBindingClient = new StatelessServiceClient("UdpEndPoint");
 

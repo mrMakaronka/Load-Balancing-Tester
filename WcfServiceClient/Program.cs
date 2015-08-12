@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.ServiceModel;
 using WcfServiceClient.RestClients;
 
@@ -11,8 +10,7 @@ namespace WcfServiceClient
         {
             try
             {
-                string webHttpEndpoint = ConfigurationManager.AppSettings["WebHttpEndpoint"];
-                using (var serviceClient = new StatelessServiceRestClient(new Uri(webHttpEndpoint)))
+                using (var serviceClient = new StatelessServiceRestClient("WebHttpEndPoint"))
                 {
                     while (true)
                     {

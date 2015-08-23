@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using WcfServiceClient.RestClients;
 using WcfServiceLibrary;
@@ -20,36 +21,37 @@ namespace WcfServiceTest
         private static readonly IStatelessService UdpBindingClient;
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (used as test case parameter)
-        private static readonly IStatelessService[] ServiceBindingCasesWithStreaming;
+        private static readonly IList<IStatelessService> ServiceBindingCasesWithStreaming;
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (used as test case parameter)
-        private static readonly IStatelessService[] ServiceBindingCasesWithoutStreaming;
+        private static readonly IList<IStatelessService> ServiceBindingCasesWithoutStreaming;
 
         private static int _serversNumber;
         private static int _requestsPerTest;
         private static Random _random;
+        private static readonly bool UseSsl;
 
         private ConcurrentDictionary<int, int> _responseNumberFromServers;
 
-        static StatelessServiceTest() 
+        static StatelessServiceTest()
         {
-            BasicHttpBindingClient = new StatelessServiceClient("BasicHttpEndPoint");
-            WebHttpBindingClient = new StatelessServiceRestClient("WebHttpEndPoint");
-            NetTcpBindingClient = new StatelessServiceClient("NetTcpEndPoint");
-            UdpBindingClient = new StatelessServiceClient("UdpEndPoint");
+            UseSsl = bool.Parse(ConfigurationManager.AppSettings["UseSsl"]);
+            BasicHttpBindingClient = new StatelessServiceClient(!UseSsl ? "BasicHttpEndPoint" : "BasicHttpEndPointSsl");
+            WebHttpBindingClient = new StatelessServiceRestClient(!UseSsl ? "WebHttpEndPoint" : "WebHttpEndPointSsl");
+            NetTcpBindingClient = new StatelessServiceClient(!UseSsl ? "NetTcpEndPoint" : "NetTcpEndPointSsl");
 
-            ServiceBindingCasesWithStreaming = new[]
-            {
-                BasicHttpBindingClient, 
-                WebHttpBindingClient, 
-                NetTcpBindingClient
-            };
-            ServiceBindingCasesWithoutStreaming = new[]
+            ServiceBindingCasesWithStreaming = new List<IStatelessService>
             {
                 BasicHttpBindingClient,
                 WebHttpBindingClient,
-                NetTcpBindingClient,
-                UdpBindingClient
+                NetTcpBindingClient
             };
+
+            ServiceBindingCasesWithoutStreaming = ServiceBindingCasesWithStreaming.ToList();
+            if (!UseSsl)
+            {
+                UdpBindingClient = new StatelessServiceClient("UdpEndPoint"); //Udp binding does not support security
+                ServiceBindingCasesWithoutStreaming.Add(UdpBindingClient);
+            }
         }
 
         [TestFixtureSetUp]
@@ -173,7 +175,10 @@ namespace WcfServiceTest
                 ((IDisposable)BasicHttpBindingClient).Dispose();
                 ((IDisposable)WebHttpBindingClient).Dispose();
                 ((IDisposable)NetTcpBindingClient).Dispose();
-                ((IDisposable)UdpBindingClient).Dispose();
+                if (!UseSsl)
+                {
+                    ((IDisposable) UdpBindingClient).Dispose();
+                }
             }
         }
     }

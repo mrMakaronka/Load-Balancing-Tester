@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.ServiceModel;
+using System.Threading;
 using WcfServiceClient.RestClients;
 
 namespace WcfServiceClient
@@ -8,9 +10,10 @@ namespace WcfServiceClient
     {
         static void Main()
         {
+            //Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             try
             {
-                using (var serviceClient = new StatelessServiceRestClient("WebHttpEndPoint"))
+                using (var serviceClient = new StatelessServiceRestClient("WebHttpEndPointSslTerminate"))
                 {
                     while (true)
                     {

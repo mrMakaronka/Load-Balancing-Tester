@@ -3,49 +3,49 @@ using System.ServiceModel;
 
 namespace WcfServiceLibrary
 {
-	[ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)]
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession, AddressFilterMode = AddressFilterMode.Any)]
 	public class StatefulService : IStatefulService
 	{
-		double _Result;
-		string _Equation;
+		private double _result;
+		private string _equation;
 
 		public StatefulService()
 		{
-			_Equation = _Result.ToString(CultureInfo.InvariantCulture);
+			_equation = _result.ToString(CultureInfo.InvariantCulture);
 		}
 
 		public void Clear()
 		{
-			Callback.Equation(_Equation + " = " + _Result.ToString(CultureInfo.InvariantCulture));
-			_Equation = _Result.ToString(CultureInfo.InvariantCulture);
+			Callback.Equation(_equation + " = " + _result.ToString(CultureInfo.InvariantCulture));
+			_equation = _result.ToString(CultureInfo.InvariantCulture);
 		}
 
 		public void AddTo(double n)
 		{
-			_Result += n;
-			_Equation += " + " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_Result);
+			_result += n;
+			_equation += " + " + n.ToString(CultureInfo.InvariantCulture);
+			Callback.Equals(_result);
 		}
 
 		public void SubtractFrom(double n)
 		{
-			_Result -= n;
-			_Equation += " - " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_Result);
+			_result -= n;
+			_equation += " - " + n.ToString(CultureInfo.InvariantCulture);
+			Callback.Equals(_result);
 		}
 
 		public void MultiplyBy(double n)
 		{
-			_Result *= n;
-			_Equation += " * " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_Result);
+			_result *= n;
+			_equation += " * " + n.ToString(CultureInfo.InvariantCulture);
+			Callback.Equals(_result);
 		}
 
 		public void DivideBy(double n)
 		{
-			_Result /= n;
-			_Equation += " / " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_Result);
+			_result /= n;
+			_equation += " / " + n.ToString(CultureInfo.InvariantCulture);
+			Callback.Equals(_result);
 		}
 
 		ICalculatorDuplexCallback Callback

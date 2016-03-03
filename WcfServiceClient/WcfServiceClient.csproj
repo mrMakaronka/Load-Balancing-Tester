@@ -69,8 +69,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SoapClients\StatelessServiceClient.cs" />
-    <Compile Include="RestClients\StatelessServiceRestClient.cs" />
+    <Compile Include="Stateful\StatefulServiceClient.cs" />
+    <Compile Include="Stateless\StatelessServiceClient.cs" />
+    <Compile Include="Stateless\StatelessServiceRestClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

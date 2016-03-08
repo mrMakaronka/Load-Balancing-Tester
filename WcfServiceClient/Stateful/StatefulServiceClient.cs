@@ -11,49 +11,37 @@
 
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-[System.ServiceModel.ServiceContractAttribute(ConfigurationName="IStatefulService", CallbackContract=typeof(IStatefulServiceCallback), SessionMode=System.ServiceModel.SessionMode.Required)]
+[System.ServiceModel.ServiceContractAttribute(ConfigurationName = "IStatefulService", CallbackContract = typeof(IStatefulServiceCallback), SessionMode = System.ServiceModel.SessionMode.Required)]
 public interface IStatefulService
 {
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/Clear")]
-    void Clear();
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/Clear")]
-    System.Threading.Tasks.Task ClearAsync();
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/AddTo")]
+
+    [System.ServiceModel.OperationContractAttribute(Action = "http://tempuri.org/IStatefulService/Start", ReplyAction = "http://tempuri.org/IStatefulService/StartResponse")]
+    void Start(double initValue);
+
+    [System.ServiceModel.OperationContractAttribute(Action = "http://tempuri.org/IStatefulService/Start", ReplyAction = "http://tempuri.org/IStatefulService/StartResponse")]
+    System.Threading.Tasks.Task StartAsync(double initValue);
+
+    [System.ServiceModel.OperationContractAttribute(IsInitiating = false, Action = "http://tempuri.org/IStatefulService/AddTo", ReplyAction = "http://tempuri.org/IStatefulService/AddToResponse")]
     void AddTo(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/AddTo")]
+
+    [System.ServiceModel.OperationContractAttribute(IsInitiating = false, Action = "http://tempuri.org/IStatefulService/AddTo", ReplyAction = "http://tempuri.org/IStatefulService/AddToResponse")]
     System.Threading.Tasks.Task AddToAsync(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/SubtractFrom")]
-    void SubtractFrom(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/SubtractFrom")]
-    System.Threading.Tasks.Task SubtractFromAsync(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/MultiplyBy")]
-    void MultiplyBy(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/MultiplyBy")]
-    System.Threading.Tasks.Task MultiplyByAsync(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/DivideBy")]
-    void DivideBy(double n);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/DivideBy")]
-    System.Threading.Tasks.Task DivideByAsync(double n);
+
+    [System.ServiceModel.OperationContractAttribute(IsTerminating = true, IsInitiating = false, Action = "http://tempuri.org/IStatefulService/Stop", ReplyAction = "http://tempuri.org/IStatefulService/StopResponse")]
+    void Stop();
+
+    [System.ServiceModel.OperationContractAttribute(IsTerminating = true, IsInitiating = false, Action = "http://tempuri.org/IStatefulService/Stop", ReplyAction = "http://tempuri.org/IStatefulService/StopResponse")]
+    System.Threading.Tasks.Task StopAsync();
 }
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
 public interface IStatefulServiceCallback
 {
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/Equals")]
+
+    [System.ServiceModel.OperationContractAttribute(IsOneWay = true, Action = "http://tempuri.org/IStatefulService/Equals")]
     void Equals(double result);
-    
-    [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IStatefulService/Equation")]
+
+    [System.ServiceModel.OperationContractAttribute(IsOneWay = true, Action = "http://tempuri.org/IStatefulService/Equation")]
     void Equation(string eqn);
 }
 
@@ -66,79 +54,59 @@ public interface IStatefulServiceChannel : IStatefulService, System.ServiceModel
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
 public partial class StatefulServiceClient : System.ServiceModel.DuplexClientBase<IStatefulService>, IStatefulService
 {
-    
-    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
-            base(callbackInstance)
+
+    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance) :
+        base(callbackInstance)
     {
     }
-    
-    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName) : 
-            base(callbackInstance, endpointConfigurationName)
+
+    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName) :
+        base(callbackInstance, endpointConfigurationName)
     {
     }
-    
-    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, string remoteAddress) : 
-            base(callbackInstance, endpointConfigurationName, remoteAddress)
+
+    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, string remoteAddress) :
+        base(callbackInstance, endpointConfigurationName, remoteAddress)
     {
     }
-    
-    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-            base(callbackInstance, endpointConfigurationName, remoteAddress)
+
+    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
+        base(callbackInstance, endpointConfigurationName, remoteAddress)
     {
     }
-    
-    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
-            base(callbackInstance, binding, remoteAddress)
+
+    public StatefulServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+        base(callbackInstance, binding, remoteAddress)
     {
     }
-    
-    public void Clear()
+
+    public void Start(double initValue)
     {
-        base.Channel.Clear();
+        base.Channel.Start(initValue);
     }
-    
-    public System.Threading.Tasks.Task ClearAsync()
+
+    public System.Threading.Tasks.Task StartAsync(double initValue)
     {
-        return base.Channel.ClearAsync();
+        return base.Channel.StartAsync(initValue);
     }
-    
+
     public void AddTo(double n)
     {
         base.Channel.AddTo(n);
     }
-    
+
     public System.Threading.Tasks.Task AddToAsync(double n)
     {
         return base.Channel.AddToAsync(n);
     }
-    
-    public void SubtractFrom(double n)
+
+    public void Stop()
     {
-        base.Channel.SubtractFrom(n);
+        base.Channel.Stop();
     }
-    
-    public System.Threading.Tasks.Task SubtractFromAsync(double n)
+
+    public System.Threading.Tasks.Task StopAsync()
     {
-        return base.Channel.SubtractFromAsync(n);
-    }
-    
-    public void MultiplyBy(double n)
-    {
-        base.Channel.MultiplyBy(n);
-    }
-    
-    public System.Threading.Tasks.Task MultiplyByAsync(double n)
-    {
-        return base.Channel.MultiplyByAsync(n);
-    }
-    
-    public void DivideBy(double n)
-    {
-        base.Channel.DivideBy(n);
-    }
-    
-    public System.Threading.Tasks.Task DivideByAsync(double n)
-    {
-        return base.Channel.DivideByAsync(n);
+        return base.Channel.StopAsync();
     }
 }

@@ -9,15 +9,10 @@ namespace WcfServiceLibrary
 		private double _result;
 		private string _equation;
 
-		public StatefulService()
+		public void Start(double initValue)
 		{
-			_equation = _result.ToString(CultureInfo.InvariantCulture);
-		}
-
-		public void Clear()
-		{
-			Callback.Equation(_equation + " = " + _result.ToString(CultureInfo.InvariantCulture));
-			_equation = _result.ToString(CultureInfo.InvariantCulture);
+		    _result = initValue;
+		    _equation = initValue.ToString(CultureInfo.InvariantCulture);
 		}
 
 		public void AddTo(double n)
@@ -27,26 +22,10 @@ namespace WcfServiceLibrary
 			Callback.Equals(_result);
 		}
 
-		public void SubtractFrom(double n)
-		{
-			_result -= n;
-			_equation += " - " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_result);
-		}
-
-		public void MultiplyBy(double n)
-		{
-			_result *= n;
-			_equation += " * " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_result);
-		}
-
-		public void DivideBy(double n)
-		{
-			_result /= n;
-			_equation += " / " + n.ToString(CultureInfo.InvariantCulture);
-			Callback.Equals(_result);
-		}
+        public void Stop()
+        {
+            Callback.Equation(_equation + " = " + _result.ToString(CultureInfo.InvariantCulture));
+        }
 
 		ICalculatorDuplexCallback Callback
 		{

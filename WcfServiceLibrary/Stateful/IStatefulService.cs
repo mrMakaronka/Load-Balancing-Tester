@@ -5,16 +5,14 @@ namespace WcfServiceLibrary
 	[ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(ICalculatorDuplexCallback))]
 	public interface IStatefulService
 	{
-		[OperationContract(IsOneWay = true)]
-		void Clear();
-		[OperationContract(IsOneWay = true)]
+        [OperationContract(IsInitiating = true, IsTerminating = false)]
+        void Start(double initValue);
+
+        [OperationContract(IsInitiating = false, IsTerminating = false)]
 		void AddTo(double n);
-		[OperationContract(IsOneWay = true)]
-		void SubtractFrom(double n);
-		[OperationContract(IsOneWay = true)]
-		void MultiplyBy(double n);
-		[OperationContract(IsOneWay = true)]
-		void DivideBy(double n);
+
+        [OperationContract(IsInitiating = false, IsTerminating = true)]
+        void Stop();
 	}
 
 	public interface ICalculatorDuplexCallback

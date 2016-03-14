@@ -38,6 +38,9 @@ public interface IStatefulService
 public interface IStatefulServiceCallback
 {
 
+    [System.ServiceModel.OperationContractAttribute(IsOneWay = true, Action = "http://tempuri.org/IStatefulService/ServerId")]
+    void ServerId([System.ServiceModel.MessageParameterAttribute(Name = "serverId")] int serverId1);
+
     [System.ServiceModel.OperationContractAttribute(IsOneWay = true, Action = "http://tempuri.org/IStatefulService/Equals")]
     void Equals(double result);
 

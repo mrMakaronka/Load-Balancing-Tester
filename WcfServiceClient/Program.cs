@@ -14,19 +14,19 @@ namespace WcfServiceClient
             try
             {
                 /*using (var statelessServiceClient = new StatelessServiceClient("BasicHttpEndPoint"))
-                {*/
-                    /*while (true)
-                    {*/
-                        //int serverId = statelessServiceClient.GetServerId();
-                        //Console.WriteLine("Server ID: " + serverId);
+                {
+                    while (true)
+                    {
+                        int serverId = statelessServiceClient.GetServerId();
+                        Console.WriteLine("Server ID: " + serverId);
                         
-                        /*ConsoleKeyInfo keyInfo = Console.ReadKey();
+                        ConsoleKeyInfo keyInfo = Console.ReadKey();
                         if (keyInfo.Key == ConsoleKey.Q)
                         {
                             break;
-                        }*/
-                   // }
-                //}
+                        }
+                    }
+                }*/
 
                 InstanceContext instanceContext = new InstanceContext(new CallbackHandler());
                 var statefulServiceClient = new StatefulServiceClient(instanceContext);
@@ -48,6 +48,11 @@ namespace WcfServiceClient
         [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
         public class CallbackHandler : IStatefulServiceCallback
         {
+            public void ServerId(int serverId)
+            {
+                Console.WriteLine("ServerId: {0}", serverId);
+            }
+
             public void Equals(double result)
             {
                 Console.WriteLine("Equals({0})", result);

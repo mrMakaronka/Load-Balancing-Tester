@@ -20,6 +20,8 @@ namespace WcfServiceHost
             {
                 throw new ConfigurationErrorsException("Parameter ServerId is not set");
             }
+            Console.WriteLine("Server ID: " + serverId);
+            Console.WriteLine();
 
             StatelessService statelessTestServiceInstance = new StatelessService(serverId);
             using (ServiceHost statelessServiceHost = new ServiceHost(statelessTestServiceInstance))

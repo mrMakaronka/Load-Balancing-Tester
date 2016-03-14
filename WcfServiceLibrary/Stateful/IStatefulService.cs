@@ -17,8 +17,12 @@ namespace WcfServiceLibrary
 
 	public interface ICalculatorDuplexCallback
 	{
+        [OperationContract(IsOneWay = true)]
+        void ServerId(int serverId);
+
 		[OperationContract(IsOneWay = true)]
 		void Equals(double result);
+
 		[OperationContract(IsOneWay = true)]
 		void Equation(string eqn);
 	}

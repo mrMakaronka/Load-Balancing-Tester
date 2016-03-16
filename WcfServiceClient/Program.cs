@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Net;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Threading;
 using WcfServiceClient.RestClients;
 
@@ -29,13 +31,20 @@ namespace WcfServiceClient
                 }*/
 
                 InstanceContext instanceContext = new InstanceContext(new CallbackHandler());
-                var statefulServiceClient = new StatefulServiceClient(instanceContext);
-                
-                statefulServiceClient.Start(0);
-                statefulServiceClient.AddTo(7);
-                statefulServiceClient.AddTo(4);
-                statefulServiceClient.Stop();
-                
+                StatefulServiceClient statefulServiceClient = new StatefulServiceClient(instanceContext);
+
+                using (new OperationContextScope(statefulServiceClient.InnerChannel))
+                {
+                    var prop = new HttpRequestMessageProperty();
+                    prop.Headers.Add(HttpRequestHeader.Cookie, "ServerId=2");
+                    OperationContext.Current.OutgoingMessageProperties.Add(HttpRequestMessageProperty.Name, prop);
+
+                    statefulServiceClient.Start(0);
+                    statefulServiceClient.AddTo(7);
+                    statefulServiceClient.AddTo(4);
+                    statefulServiceClient.Stop();
+                }
+
                 Console.ReadLine();
                 statefulServiceClient.Close();
             }

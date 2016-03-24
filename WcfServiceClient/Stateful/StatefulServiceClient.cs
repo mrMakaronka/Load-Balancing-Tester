@@ -16,16 +16,16 @@ public interface IStatefulService
 {
 
     [System.ServiceModel.OperationContractAttribute(Action = "http://tempuri.org/IStatefulService/Start", ReplyAction = "http://tempuri.org/IStatefulService/StartResponse")]
-    void Start(double initValue);
+    void Start(int initValue);
 
     [System.ServiceModel.OperationContractAttribute(Action = "http://tempuri.org/IStatefulService/Start", ReplyAction = "http://tempuri.org/IStatefulService/StartResponse")]
-    System.Threading.Tasks.Task StartAsync(double initValue);
+    System.Threading.Tasks.Task StartAsync(int initValue);
 
     [System.ServiceModel.OperationContractAttribute(IsInitiating = false, Action = "http://tempuri.org/IStatefulService/AddTo", ReplyAction = "http://tempuri.org/IStatefulService/AddToResponse")]
-    void AddTo(double n);
+    void AddTo(int n);
 
     [System.ServiceModel.OperationContractAttribute(IsInitiating = false, Action = "http://tempuri.org/IStatefulService/AddTo", ReplyAction = "http://tempuri.org/IStatefulService/AddToResponse")]
-    System.Threading.Tasks.Task AddToAsync(double n);
+    System.Threading.Tasks.Task AddToAsync(int n);
 
     [System.ServiceModel.OperationContractAttribute(IsTerminating = true, IsInitiating = false, Action = "http://tempuri.org/IStatefulService/Stop", ReplyAction = "http://tempuri.org/IStatefulService/StopResponse")]
     void Stop();
@@ -42,7 +42,7 @@ public interface IStatefulServiceCallback
     void ServerId([System.ServiceModel.MessageParameterAttribute(Name = "serverId")] int serverId1);
 
     [System.ServiceModel.OperationContractAttribute(IsOneWay = true, Action = "http://tempuri.org/IStatefulService/Equals")]
-    void Equals(double result);
+    void Equals(int result);
 
     [System.ServiceModel.OperationContractAttribute(IsOneWay = true, Action = "http://tempuri.org/IStatefulService/Equation")]
     void Equation(string eqn);
@@ -83,22 +83,22 @@ public partial class StatefulServiceClient : System.ServiceModel.DuplexClientBas
     {
     }
 
-    public void Start(double initValue)
+    public void Start(int initValue)
     {
         base.Channel.Start(initValue);
     }
 
-    public System.Threading.Tasks.Task StartAsync(double initValue)
+    public System.Threading.Tasks.Task StartAsync(int initValue)
     {
         return base.Channel.StartAsync(initValue);
     }
 
-    public void AddTo(double n)
+    public void AddTo(int n)
     {
         base.Channel.AddTo(n);
     }
 
-    public System.Threading.Tasks.Task AddToAsync(double n)
+    public System.Threading.Tasks.Task AddToAsync(int n)
     {
         return base.Channel.AddToAsync(n);
     }

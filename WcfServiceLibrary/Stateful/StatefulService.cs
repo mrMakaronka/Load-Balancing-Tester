@@ -7,7 +7,7 @@ namespace WcfServiceLibrary
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession, AddressFilterMode = AddressFilterMode.Any)]
 	public class StatefulService : IStatefulService
 	{
-		private double _result;
+        private int _result;
 		private string _equation;
         private readonly int _serverId;
 
@@ -18,14 +18,14 @@ namespace WcfServiceLibrary
             int.TryParse(ConfigurationManager.AppSettings["ServerId"], out _serverId);
         }
 
-		public void Start(double initValue)
+		public void Start(int initValue)
 		{
 		    _result = initValue;
 		    _equation = initValue.ToString(CultureInfo.InvariantCulture);
             Callback.ServerId(_serverId);
 		}
 
-		public void AddTo(double n)
+        public void AddTo(int n)
 		{
 			_result += n;
 			_equation += " + " + n.ToString(CultureInfo.InvariantCulture);

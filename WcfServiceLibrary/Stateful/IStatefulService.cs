@@ -6,10 +6,10 @@ namespace WcfServiceLibrary
 	public interface IStatefulService
 	{
         [OperationContract(IsInitiating = true, IsTerminating = false)]
-        void Start(double initValue);
+        void Start(int initValue);
 
         [OperationContract(IsInitiating = false, IsTerminating = false)]
-		void AddTo(double n);
+        void AddTo(int n);
 
         [OperationContract(IsInitiating = false, IsTerminating = true)]
         void Stop();
@@ -21,7 +21,7 @@ namespace WcfServiceLibrary
         void ServerId(int serverId);
 
 		[OperationContract(IsOneWay = true)]
-		void Equals(double result);
+		void Equals(int result);
 
 		[OperationContract(IsOneWay = true)]
 		void Equation(string eqn);

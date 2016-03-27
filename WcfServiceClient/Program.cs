@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using System.Net;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.Threading;
-using WcfServiceClient.RestClients;
 
 namespace WcfServiceClient
 {
@@ -15,38 +12,34 @@ namespace WcfServiceClient
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             try
             {
-                /*using (var statelessServiceClient = new StatelessServiceClient("BasicHttpEndPoint"))
+                StatelessServiceClient statelessServiceClient = new StatelessServiceClient("BasicHttpEndPoint");
+                while (true)
                 {
-                    while (true)
-                    {
-                        int serverId = statelessServiceClient.GetServerId();
-                        Console.WriteLine("Server ID: " + serverId);
+                    int serverId = statelessServiceClient.GetServerId();
+                    Console.WriteLine("Server ID: " + serverId);
                         
-                        ConsoleKeyInfo keyInfo = Console.ReadKey();
-                        if (keyInfo.Key == ConsoleKey.Q)
-                        {
-                            break;
-                        }
+                    ConsoleKeyInfo keyInfo = Console.ReadKey();
+                    if (keyInfo.Key == ConsoleKey.Q)
+                    {
+                        break;
                     }
-                }*/
+                }
+                statelessServiceClient.Close();
+                Console.WriteLine();
 
                 InstanceContext instanceContext = new InstanceContext(new CallbackHandler());
-                StatefulServiceClient statefulServiceClient = new StatefulServiceClient(instanceContext);
+                StatefulServiceClient statefulServiceClient = new StatefulServiceClient(instanceContext, "NetTcpCustomStatefulEndPoint");
 
                 using (new OperationContextScope(statefulServiceClient.InnerChannel))
                 {
-                    var prop = new HttpRequestMessageProperty();
-                    prop.Headers.Add(HttpRequestHeader.Cookie, "ServerId=2");
-                    OperationContext.Current.OutgoingMessageProperties.Add(HttpRequestMessageProperty.Name, prop);
-
                     statefulServiceClient.Start(0);
-                    statefulServiceClient.AddTo(7);
-                    statefulServiceClient.AddTo(4);
-                    statefulServiceClient.Stop();
-                }
+                    for (int i = 0; i < 10; i++)
+                        statefulServiceClient.AddTo(4);
 
+                    statefulServiceClient.Stop();
+                    statefulServiceClient.Close();
+                }
                 Console.ReadLine();
-                statefulServiceClient.Close();
             }
             catch (CommunicationException cex)
             {
@@ -62,7 +55,7 @@ namespace WcfServiceClient
                 Console.WriteLine("ServerId: {0}", serverId);
             }
 
-            public void Equals(double result)
+            public void Equals(int result)
             {
                 Console.WriteLine("Equals({0})", result);
             }

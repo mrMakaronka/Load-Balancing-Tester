@@ -28,17 +28,27 @@ namespace WcfServiceClient
                 Console.WriteLine();
 
                 InstanceContext instanceContext = new InstanceContext(new CallbackHandler());
-                StatefulServiceClient statefulServiceClient = new StatefulServiceClient(instanceContext, "NetTcpCustomStatefulEndPoint");
+                StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(instanceContext, "NetTcpCustomStatefulEndPoint");
+                statefulDuplexServiceClient.Start(0);
+                for (int i = 0; i < 10; i++)
+                    statefulDuplexServiceClient.AddTo(4);
 
-                using (new OperationContextScope(statefulServiceClient.InnerChannel))
+                statefulDuplexServiceClient.Stop();
+                statefulDuplexServiceClient.Close();
+                Console.ReadLine();
+                Console.WriteLine();
+
+                StatefulSimplexServiceClient statefulSimplexServiceClient = new StatefulSimplexServiceClient("WsHttpEndPoint");
+                int serverIdSimplex = statefulSimplexServiceClient.Start(0);
+                Console.WriteLine("ServerId: {0}", serverIdSimplex);
+                for (int i = 0; i < 10; i++)
                 {
-                    statefulServiceClient.Start(0);
-                    for (int i = 0; i < 10; i++)
-                        statefulServiceClient.AddTo(4);
-
-                    statefulServiceClient.Stop();
-                    statefulServiceClient.Close();
+                    int result = statefulSimplexServiceClient.AddTo(5);
+                    Console.WriteLine("Equals({0})", result);
                 }
+                string equationResult = statefulSimplexServiceClient.Stop();
+                Console.WriteLine("Equation({0})", equationResult);
+                statefulSimplexServiceClient.Close();
                 Console.ReadLine();
             }
             catch (CommunicationException cex)
@@ -48,7 +58,7 @@ namespace WcfServiceClient
         }
 
         [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
-        public class CallbackHandler : IStatefulServiceCallback
+        public class CallbackHandler : IStatefulDuplexServiceCallback
         {
             public void ServerId(int serverId)
             {
@@ -60,9 +70,9 @@ namespace WcfServiceClient
                 Console.WriteLine("Equals({0})", result);
             }
 
-            public void Equation(string eqn)
+            public void Equation(string equationResult)
             {
-                Console.WriteLine("Equation({0})", eqn);
+                Console.WriteLine("Equation({0})", equationResult);
             }
         }
     }

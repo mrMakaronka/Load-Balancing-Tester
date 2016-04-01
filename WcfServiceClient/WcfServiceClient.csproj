@@ -69,7 +69,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stateful\StatefulServiceClient.cs" />
+    <Compile Include="Stateful\StatefulDuplexServiceClient.cs" />
+    <Compile Include="Stateful\StatefulSimplexServiceClient.cs" />
     <Compile Include="Stateless\StatelessServiceClient.cs" />
     <Compile Include="Stateless\StatelessServiceRestClient.cs" />
   </ItemGroup>

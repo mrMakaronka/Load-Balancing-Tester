@@ -67,6 +67,10 @@ namespace WcfServiceTest
         public void TestInitialize()
         {
             _responseNumberFromServers = new ConcurrentDictionary<int, int>();
+            for (int i = 1; i <= _serversNumber; i++)
+            {
+                _responseNumberFromServers.TryAdd(i, 0);
+            }
         }
 
         [TearDown]

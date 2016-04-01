@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Text;
 using NUnit.Framework;
 
@@ -17,6 +18,7 @@ namespace WcfServiceTest
         private static string _bindingForTest;
         private static string _serverIdUrlParamName;
         private static string _stickyUrlParamName;
+        private static bool _duplexChannel;
 
         private static Random _random;
         private static int _randomMinvalue;
@@ -37,10 +39,11 @@ namespace WcfServiceTest
             _bindingForTest = ConfigurationManager.AppSettings["StatefulBindingForTest"];
             _serverIdUrlParamName = ConfigurationManager.AppSettings["ServerIdUrlParamName"];
             _stickyUrlParamName = ConfigurationManager.AppSettings["StickyUrlParamName"];
+            _duplexChannel = bool.Parse(ConfigurationManager.AppSettings["DuplexChannel"]);
 
             _random = new Random((int)DateTime.Now.Ticks);
             _randomMinvalue = 0;
-            _randomMaxvalue = Int32.MaxValue/(_requestsPerSession + 1); // Consider initial value
+            _randomMaxvalue = Int32.MaxValue / (_requestsPerSession + 1); // Consider initial value
             _instanceContext = new InstanceContext(new CallbackHandler());
         }
 
@@ -48,6 +51,10 @@ namespace WcfServiceTest
         public void TestInitialize()
         {
             _responseNumberFromServers = new ConcurrentDictionary<int, int>();
+            for (int i = 1; i <= _serversNumber; i++)
+            {
+                _responseNumberFromServers.TryAdd(i, 0);
+            }
         }
 
         [Test]
@@ -55,12 +62,21 @@ namespace WcfServiceTest
         {
             for (int i = 0; i < _sessionsPerTest; i++)
             {
-                // Arrange
+                //Arrange
                 _currentResult = 0;
-                StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(_instanceContext, _bindingForTest);
+                Tuple<int, string> resultTuple;
 
-                // Act
-                Tuple<int, string> resultTuple = ExecuteTestAction(statefulDuplexServiceClient);
+                //Act
+                if (_duplexChannel)
+                {
+                    StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(_instanceContext, _bindingForTest);
+                    resultTuple = ExecuteDuplexTestAction(statefulDuplexServiceClient);
+                }
+                else
+                {
+                    StatefulSimplexServiceClient statefulSimplexServiceClient = new StatefulSimplexServiceClient(_bindingForTest);
+                    resultTuple = ExecuteSimplexTestAction(statefulSimplexServiceClient);
+                }
 
                 //Assert
                 Assert.AreEqual(resultTuple.Item1, _currentResult);
@@ -76,13 +92,22 @@ namespace WcfServiceTest
             {
                 //Arrange
                 _currentResult = 0;
-
-                StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(_instanceContext, _bindingForTest);
+                Tuple<int, string> resultTuple;
                 int serverId = (i % _serversNumber) + 1;
-                AddUrlParamToAllRequests(statefulDuplexServiceClient, _serverIdUrlParamName, serverId.ToString());
 
                 //Act
-                Tuple<int, string> resultTuple = ExecuteTestAction(statefulDuplexServiceClient);
+                if (_duplexChannel)
+                {
+                    StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(_instanceContext, _bindingForTest);
+                    AddUrlParamToAllRequests(statefulDuplexServiceClient.Endpoint, _serverIdUrlParamName, serverId.ToString());
+                    resultTuple = ExecuteDuplexTestAction(statefulDuplexServiceClient);
+                }
+                else
+                {
+                    StatefulSimplexServiceClient statefulDuplexServiceClient = new StatefulSimplexServiceClient(_bindingForTest);
+                    AddUrlParamToAllRequests(statefulDuplexServiceClient.Endpoint, _serverIdUrlParamName, serverId.ToString());
+                    resultTuple = ExecuteSimplexTestAction(statefulDuplexServiceClient);
+                }
 
                 //Assert
                 Assert.AreEqual(resultTuple.Item1, _currentResult);
@@ -101,13 +126,22 @@ namespace WcfServiceTest
             {
                 //Arrange
                 _currentResult = 0;
-
-                StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(_instanceContext, _bindingForTest);
+                Tuple<int, string> resultTuple;
                 int stickyRandomParam = _random.Next();
-                AddUrlParamToAllRequests(statefulDuplexServiceClient, _stickyUrlParamName, stickyRandomParam.ToString());
 
                 //Act
-                Tuple<int, string> resultTuple = ExecuteTestAction(statefulDuplexServiceClient);
+                if (_duplexChannel)
+                {
+                    StatefulDuplexServiceClient statefulDuplexServiceClient = new StatefulDuplexServiceClient(_instanceContext, _bindingForTest);
+                    AddUrlParamToAllRequests(statefulDuplexServiceClient.Endpoint, _stickyUrlParamName, stickyRandomParam.ToString());
+                    resultTuple = ExecuteDuplexTestAction(statefulDuplexServiceClient);
+                }
+                else
+                {
+                    StatefulSimplexServiceClient statefulDuplexServiceClient = new StatefulSimplexServiceClient(_bindingForTest);
+                    AddUrlParamToAllRequests(statefulDuplexServiceClient.Endpoint, _stickyUrlParamName, stickyRandomParam.ToString());
+                    resultTuple = ExecuteSimplexTestAction(statefulDuplexServiceClient);
+                }
 
                 //Assert
                 Assert.AreEqual(resultTuple.Item1, _currentResult);
@@ -144,7 +178,34 @@ namespace WcfServiceTest
 
         #region Auxiliary functionality
 
-        private Tuple<int, string> ExecuteTestAction(StatefulDuplexServiceClient statefulDuplexServiceClient)
+        private Tuple<int, string> ExecuteSimplexTestAction(StatefulSimplexServiceClient statefulSimplexServiceClient)
+        {
+            int initialNum = GetRandomInCorrectRange();
+            int serverId = statefulSimplexServiceClient.Start(initialNum);
+            _responseNumberFromServers.AddOrUpdate(serverId, 1, (id, count) => count + 1);
+
+            int expectedResult = initialNum;
+            StringBuilder expectedStringResultStringBuilder = new StringBuilder(initialNum.ToString());
+
+            for (int j = 0; j < _requestsPerSession; j++)
+            {
+                int summand = GetRandomInCorrectRange();
+                _currentResult = statefulSimplexServiceClient.AddTo(summand);
+
+                expectedResult += summand;
+                expectedStringResultStringBuilder.Append(string.Format(" + {0}", summand));
+            }
+            _currentEquationStringResult = statefulSimplexServiceClient.Stop();
+            statefulSimplexServiceClient.Close();
+
+            expectedStringResultStringBuilder.Append(string.Format(" = {0}", _currentResult));
+            string expectedStringResult = expectedStringResultStringBuilder.ToString();
+
+            Tuple<int, string> resultTuple = new Tuple<int, string>(expectedResult, expectedStringResult);
+            return resultTuple;
+        }
+
+        private Tuple<int, string> ExecuteDuplexTestAction(StatefulDuplexServiceClient statefulDuplexServiceClient)
         {
             int initialNum = GetRandomInCorrectRange();
             statefulDuplexServiceClient.Start(initialNum);
@@ -165,19 +226,17 @@ namespace WcfServiceTest
 
             expectedStringResultStringBuilder.Append(string.Format(" = {0}", _currentResult));
             string expectedStringResult = expectedStringResultStringBuilder.ToString();
-            
+
             Tuple<int, string> resultTuple = new Tuple<int, string>(expectedResult, expectedStringResult);
             return resultTuple;
         }
 
-        private void AddUrlParamToAllRequests(StatefulDuplexServiceClient statefulDuplexServiceClient, string urlParamName, string urlParamValue)
+        private void AddUrlParamToAllRequests(ServiceEndpoint serviceEndpoint, string urlParamName, string urlParamValue)
         {
-            string newServiceUriString =
-                string.Format(statefulDuplexServiceClient.Endpoint.Address.Uri.AbsoluteUri + "?{0}={1}", urlParamName,
-                    urlParamValue);
+            string newServiceUriString = string.Format(serviceEndpoint.Address.Uri.AbsoluteUri + "?{0}={1}", urlParamName, urlParamValue);
             Uri newServiceUri = new Uri(newServiceUriString);
             EndpointAddress endpointAddress = new EndpointAddress(newServiceUri);
-            statefulDuplexServiceClient.Endpoint.Address = endpointAddress;
+            serviceEndpoint.Address = endpointAddress;
         }
 
         private int GetRandomInCorrectRange()

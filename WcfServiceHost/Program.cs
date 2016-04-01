@@ -26,28 +26,34 @@ namespace WcfServiceHost
             StatelessService statelessTestServiceInstance = new StatelessService(serverId);
             using (ServiceHost statelessServiceHost = new ServiceHost(statelessTestServiceInstance))
             {
-                using (ServiceHost statefulServiceHost = new ServiceHost(typeof(StatefulService)))
+                using (ServiceHost statefulSimplexServiceHost = new ServiceHost(typeof (StatefulSimplexService)))
                 {
-                    try
+                    using (ServiceHost statefulDuplexServiceHost = new ServiceHost(typeof (StatefulDuplexService)))
                     {
-                        statelessServiceHost.Open();
-                        statefulServiceHost.Open();
-                        Console.WriteLine("IPs: ");
-                        foreach (IPAddress ip in HostUtils.GetLocalIpAddresses())
+                        try
                         {
-                            Console.WriteLine(ip.ToString());
+                            statelessServiceHost.Open();
+                            statefulSimplexServiceHost.Open();
+                            statefulDuplexServiceHost.Open();
+                            Console.WriteLine("IPs: ");
+                            foreach (IPAddress ip in HostUtils.GetLocalIpAddresses())
+                            {
+                                Console.WriteLine(ip.ToString());
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine("Press <ENTER> to terminate");
+                            Console.ReadLine();
+                            statelessServiceHost.Close();
+                            statefulSimplexServiceHost.Close();
+                            statefulDuplexServiceHost.Close();
                         }
-                        Console.WriteLine();
-                        Console.WriteLine("Press <ENTER> to terminate");
-                        Console.ReadLine();
-                        statelessServiceHost.Close();
-                        statefulServiceHost.Close();
-                    }
-                    catch (CommunicationException cex)
-                    {
-                        Console.WriteLine("An exception occurred: {0}", cex.Message);
-                        statelessServiceHost.Abort();
-                        statefulServiceHost.Abort();
+                        catch (CommunicationException cex)
+                        {
+                            Console.WriteLine("An exception occurred: {0}", cex.Message);
+                            statelessServiceHost.Abort();
+                            statefulSimplexServiceHost.Abort();
+                            statefulDuplexServiceHost.Abort();
+                        }
                     }
                 }
             }

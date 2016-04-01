@@ -2,8 +2,8 @@
 
 namespace WcfServiceLibrary
 {
-	[ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(ICalculatorDuplexCallback))]
-	public interface IStatefulService
+	[ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(IDuplexCallback))]
+	public interface IStatefulDuplexService
 	{
         [OperationContract(IsInitiating = true, IsTerminating = false)]
         void Start(int initValue);
@@ -15,7 +15,7 @@ namespace WcfServiceLibrary
         void Stop();
 	}
 
-	public interface ICalculatorDuplexCallback
+	public interface IDuplexCallback
 	{
         [OperationContract(IsOneWay = true)]
         void ServerId(int serverId);

@@ -10,6 +10,7 @@ The main purpose of the tool is to check if your load balancing solution is set 
  * WCF features
 
 The tool covers the following load balancing scenarios:
+
 1. Stateless services
 	* All requests are uniformly distributed across the server instances
 2. Stateful services
@@ -19,16 +20,16 @@ The tool covers the following load balancing scenarios:
 
 The project contains a lot of pre-defined WCF bindings, which cover many test cases including different types of protocols, security connection scenarios, and WCF features. By adding additional bindings, the tool can be configured for custom test cases. 
 
-Steps to run the tool:
-1. Install ```service.pfx``` certificate from Certificates folder on the each server instance and on the client machine
-2. Add installed certificate for the following IP ports on each server instance:
+##### Steps to run the tool:
+1. Install ```root.cer``` and ```service.pfx``` certificates from Certificates folder on the each server instance and on the client machine
+2. Add installed certificate for the following ports on the each server instance:
 	* 8734
 	* 8736
 	* 9734
 	* 9736
 	* 7834
-3. Install ```client.pfx``` certificate from Certificates folder on the client machine
-4. Build and run WCF self-hosted service (```WcfServiceHost``` project) on the each server instance. Please make sure that each service instance has its own distinct value from 1 to N (N - amount of the server instances) of ServersNumber parameter, which is defined in the ```App.config```
+3. Install ```root.cer``` and ```client.pfx``` certificates from Certificates folder on the client machine
+4. Build and run WCF self-hosted service (```WcfServiceHost``` project) on the each server instance. Please make sure that each service instance has its own distinct value from 1 to N (N - amount of the server instances) of ```ServersNumber``` parameter, which is defined in the ```App.config```
 5. Set up load balancing solution
 6. Add the load balancer's IP address for ```testservice``` hostname on the client machine
 7. Open ```WCFClient``` solution

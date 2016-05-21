@@ -1,0 +1,6 @@
+<binding name="WebHttpBinding"
+         sendTimeout="00:30:00"
+         maxReceivedMessageSize="67108864"
+         transferMode="Streamed">
+    <security mode="None"/>
+</binding> 

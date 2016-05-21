@@ -1,0 +1,7 @@
+<binding name="BasicHttpBinding"
+         sendTimeout="00:30:00"
+         maxReceivedMessageSize="67108864"
+         transferMode="Streamed"
+         messageEncoding="Mtom">
+    <security mode="None"/>
+</binding>

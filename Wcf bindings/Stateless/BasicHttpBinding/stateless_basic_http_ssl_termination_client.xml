@@ -1,0 +1,7 @@
+<binding name="BasicHttpBindingSslTerminate"
+		 maxReceivedMessageSize="67108864" 
+    	 messageEncoding="Mtom">
+    <security mode="Transport">
+      	<transport clientCredentialType="Certificate" />
+    </security>
+</binding>

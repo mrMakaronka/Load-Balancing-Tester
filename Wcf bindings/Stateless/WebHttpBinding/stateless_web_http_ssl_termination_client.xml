@@ -1,0 +1,6 @@
+<binding name="WebHttpBindingSslTerminate"
+		 maxReceivedMessageSize="67108864">
+    <security mode="Transport">
+      	<transport clientCredentialType="Certificate" />
+    </security>
+</binding>

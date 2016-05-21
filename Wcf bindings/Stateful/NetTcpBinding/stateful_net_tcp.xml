@@ -1,0 +1,10 @@
+<binding name="NetTcpCustomStatefulEndPointConfiguration">
+	<reliableSession />
+	<security authenticationMode="SecureConversation">
+		<secureConversationBootstrap authenticationMode="MutualCertificate" />
+	</security>
+	<binaryMessageEncoding />
+	<tcpTransport>
+		<connectionPoolSettings leaseTimeout="00:00:00" />
+	</tcpTransport>
+</binding>

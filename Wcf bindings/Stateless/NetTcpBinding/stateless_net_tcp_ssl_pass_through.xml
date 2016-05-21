@@ -1,0 +1,9 @@
+<binding name="NetTcpCustomEndPointConfigurationSsl"
+		 sendTimeout="00:30:00">
+    <binaryMessageEncoding />
+    <sslStreamSecurity requireClientCertificate="true" />
+    <tcpTransport maxReceivedMessageSize="67108864"
+				  transferMode="Streamed">
+        <connectionPoolSettings leaseTimeout="00:00:00" />
+    </tcpTransport>
+</binding>

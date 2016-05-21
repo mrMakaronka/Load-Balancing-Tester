@@ -1,0 +1,7 @@
+<udpBinding>
+	<binding name="UdpEndPointConfiguration"
+		sendTimeout="00:30:00"
+		maxReceivedMessageSize="67108864"
+		timeToLive="5">	<!-- Allowed to go through 5 routers-->
+	</binding>
+</udpBinding>

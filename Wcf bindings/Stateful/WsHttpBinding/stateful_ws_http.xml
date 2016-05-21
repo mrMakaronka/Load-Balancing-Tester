@@ -1,0 +1,8 @@
+<binding name="WsHttpEndpointConfigurationSsl">
+	<reliableSession />
+	<security authenticationMode="SecureConversation">
+		<secureConversationBootstrap authenticationMode="MutualCertificate" />
+	</security>
+	<textMessageEncoding />
+	<httpTransport keepAliveEnabled="false" />
+</binding>

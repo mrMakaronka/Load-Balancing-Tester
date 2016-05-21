@@ -1,0 +1,8 @@
+<binding name="WebHttpCustomBinding" sendTimeout="00:30:00">
+	<webMessageEncoding />
+	<httpsTransport keepAliveEnabled="false" 
+					maxReceivedMessageSize="67108864"
+					transferMode="Streamed" 
+					requireClientCertificate="true"
+					manualAddressing="true" />
+</binding>

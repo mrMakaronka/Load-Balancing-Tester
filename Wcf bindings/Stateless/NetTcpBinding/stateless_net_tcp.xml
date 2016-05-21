@@ -1,0 +1,8 @@
+<binding name="NetTcpBinding"
+         sendTimeout="00:30:00"
+         maxReceivedMessageSize="67108864"
+         transferMode="Streamed">
+	<security mode="Transport">
+		<transport clientCredentialType="Certificate"/>
+	</security>
+</binding>

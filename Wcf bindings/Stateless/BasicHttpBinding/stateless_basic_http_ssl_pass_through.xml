@@ -1,0 +1,7 @@
+<binding name="BasicHttpCustomBinding" sendTimeout="00:30:00">
+	<mtomMessageEncoding  messageVersion="Soap11" />
+	<httpsTransport	keepAliveEnabled="false" 
+					maxReceivedMessageSize="67108864"
+					transferMode="Streamed" 
+					requireClientCertificate="true" />
+</binding>
